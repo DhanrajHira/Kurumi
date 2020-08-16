@@ -1,4 +1,4 @@
 from Kurumi import Kurumi
 
 client = Kurumi()
-print(client.search('Naruto')[0].get_episodes().get_episode_by_number(4))
+print(client.search('Boruto')[0].get_episodes().get_episode_by_number(1).get_downloads())

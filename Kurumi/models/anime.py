@@ -23,7 +23,10 @@ class Anime(object):
         return f"<Anime {self.id}>"
 
     async def get_episodes_async(self):
-        pages = self.episodes / 30
+        if self.episodes < 1:
+            pages = 1
+        else:
+            pages = int(self.episodes / 30)
         page = 1
         episodes = []
         while page <= pages:
