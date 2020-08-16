@@ -1,4 +1,5 @@
 import json
+from Kurumi.utils.html_parser import HtmlParser
 
 class Episodes(object):
     def __init__(self, episodes):
@@ -36,7 +37,7 @@ class Episode(object):
 
     async def get_downloads_async(self):
         data = {'m': 'links', 'id': self.anime_id, 'session': self.session, 'p':'kwik'}
-        res = await self.__network.get(data)
+        res = await self.__network.get(data=data)
         json_response = json.loads(await res.text())
         return [Downloadable(list(dwn.keys())[0], dwn[list(dwn.keys())[0]], self.__network, self.__loop) for dwn in json_response['data']]
 
@@ -63,3 +64,12 @@ class Downloadable(object):
     
     def __repr__(self):
         return f'<Quality {self.quality}>'
+
+    async def get_m3u8_async(self):
+        res = await self.__network.get(url=self.kwik)
+        return HtmlParser(await res.text()).get_full_url()
+    
+    def get_m3u8(self):
+        return self.__loop.run_until_complete(self.get_m3u8_async())
+
+    # To get the m3u8 content the referer has to be https://kwik.cx

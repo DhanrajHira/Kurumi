@@ -1,17 +1,20 @@
 from bs4 import BeautifulSoup
-
+import re
 class HtmlParser(object):
     def __init__(self, html):
         self.html = html
         self.soup = BeautifulSoup(html, "html.parser")
-
-    def get_m3u8_url(self):
-        link_tags = self.soup.findAll("link", {"rel": "dns-prefetch"})
-        cdn_base_url = None
-        for link_tag in link_tags:
-            if "cdn-" in link_tag.get("href"):
-                cdn_base_url = link_tag.get("href")
-                break
         
+    def get_full_url(self):
+        return f"{self.get_cdn()}/stream/{self.get_kwik_poster_url().replace('.jpg', '').replace('https://i.kwik.cx/snapshot/','')}/uwu.m3u8"
+
+    def get_cdn(self):
+        regex = re.search('kwik\|key\|(..)\|(..)\|stream', self.html)
+        region = regex.group(1)
+        server = regex.group(2)
+        cdn_url = f"https://cdn-{region}-{server}.nextstream.org"
+        return cdn_url
+
     def get_kwik_poster_url(self):
         return self.soup.find("video").get("poster")
+    

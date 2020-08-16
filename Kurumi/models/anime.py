@@ -31,7 +31,7 @@ class Anime(object):
         episodes = []
         while page <= pages:
             data = {'m': 'release', 'id': self.id, 'l': 30, 'sort': 'episode_asc', 'page': page}
-            res = await self.__network.get(data)
+            res = await self.__network.get(data=data)
             res = json.loads(await res.text())
             if page == 1:
                 pages = res['last_page']

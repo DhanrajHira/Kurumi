@@ -15,7 +15,7 @@ class Kurumi():
 
     async def search_async(self, query, results=12):
         data = {'m':'search', 'l': results, 'q':query}
-        res = await self.network.get(data)
+        res = await self.network.get(data=data)
         json_response = json.loads(await res.text())
         return [Anime(anime, self.network, self.loop) for anime in json_response['data']]
 
