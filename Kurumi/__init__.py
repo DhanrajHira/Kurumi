@@ -16,7 +16,7 @@ class Kurumi():
     async def search_async(self, query, results=12):
         res = await self.network.get(f'/api?m=search&l={results}&q={query}')
         json_response = json.loads(await res.text())
-        return [Anime(anime) for anime in json_response['data']]
+        return [Anime(anime, self.network, self.loop) for anime in json_response['data']]
 
     def search(self, query, results=12):
         # I have no idea how asyncio works or how i'm supposed to use the aiohttp session, sorry!

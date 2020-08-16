@@ -1,6 +1,20 @@
+class Episodes(object):
+    def __init__(self, episodes):
+        self.episodes = episodes
+    
+    def __repr__(self):
+        return f"<{len(self.episodes)} episodes>"
+    
+    def get_episode_by_number(self, number):
+        for x in self.episodes:
+            if x.episode == number:
+                return x
+
 class Episode(object):
 
-    def __init__(self, json_response):
+    def __init__(self, json_response, network, loop):
+        self.__network = network
+        self.__loop = loop
         self.anime_id = json_response.get("anime_id", None)
         self.created_at = json_response.get("created_at", None)
         self.disc = json_response.get("disc", None)
@@ -14,4 +28,7 @@ class Episode(object):
         self.snapshot = json_response.get("snapshot", None)
         self.fansub = json_response.get("fansub", None)
         self.title = json_response.get("title", None)
+
+    def __repr__(self):
+        return f"<Episode {self.id}>"
 
