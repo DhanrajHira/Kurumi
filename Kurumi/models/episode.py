@@ -12,5 +12,6 @@ class Episode(object):
         self.id = json_response.get("id", None)
         self.session = json_response.get("session", None)
         self.snapshot = json_response.get("snapshot", None)
+        self.fansub = json_response.get("fansub", None)
         self.title = json_response.get("title", None)
 

@@ -14,3 +14,5 @@ class Anime(object):
         self.type = json_response.get("type", None)
         self.year = json_response.get("year", None)
 
+    def __repr__(self):
+        return f"<Anime {self.id}>"
