@@ -9,9 +9,15 @@ class Network(object):
         }
         self.__client__ = aiohttp.ClientSession(headers=headers)
 
-    async def get(self, url):
-        response = await self.__client__.get(f"{self.BASE_URL}{url}") 
+    async def get(self, data):
+        response = await self.__client__.get(await self.create_url(data)) 
         return response
         
     async def close(self):
         await self.__client__.close()
+
+    async def create_url(self, params):
+        url_params = ''
+        for x in params:
+            url_params += f'&{x}={params[x]}'
+        return f"{self.BASE_URL}/api{url_params.replace('&', '?', 1)}"
