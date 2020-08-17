@@ -17,6 +17,7 @@ class KwikVideoData(object):
         self.kwik_adfly = json_response.get('kwik_adfly', None)
         self.kwik_shst = json_response.get('kwik_shst', None)
         self.server = json_response.get('server', None)
+        self.m3u8 = None
     
     def __repr__(self):
         return f'<Quality {self.quality}p>'
@@ -32,7 +33,10 @@ class KwikVideoData(object):
     # To get the m3u8 content the referer has to be https://kwik.cx
 
     async def get_m3u8(self):
-        headers = {"referer": "https://kwik.cx"}
-        m3u8_url = await self.get_m3u8_url()
-        response = await self.__network__.get(m3u8_url, headers=headers)
-        return M3U8(await response.text())
+        if self.m3u8 is None:
+            headers = {"referer": "https://kwik.cx"}
+            m3u8_url = await self.get_m3u8_url()
+            response = await self.__network__.get(m3u8_url, headers=headers)
+            print(await response.text())
+            self.m3u8 = M3U8(await response.text()) 
+        return self.m3u8
