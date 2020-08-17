@@ -37,7 +37,7 @@ class Anime(object):
             }
             json_response = await self.__network__.get_from_api(params = params)
             episodes.extend([
-                Episode(episode_data, self.__network__) for episode_data in json_response["data"]
+                Episode(episode_data, self.__network__, self.title) for episode_data in json_response["data"]
                 ])
 
         return Episodes(episodes)

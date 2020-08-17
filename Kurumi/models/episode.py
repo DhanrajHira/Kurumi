@@ -18,8 +18,9 @@ class Episodes(object):
 
 class Episode(object):
 
-    def __init__(self, json_response, network):
+    def __init__(self, json_response, network, anime_title="anime"):
         self.__network__ = network
+        self.anime_title = anime_title
         self.anime_id = json_response.get("anime_id", None)
         self.created_at = json_response.get("created_at", None)
         self.disc = json_response.get("disc", None)
@@ -56,7 +57,7 @@ class Episode(object):
                 break 
         m3u8 = await selected_data.get_m3u8()
         if file_name is None:
-            file_name = f"{self.id}-{self.episode}"
+            file_name = f"{self.anime_title}-{self.episode}"
         if multi_threading:
             dl = MultiThreadDownloader(download_network, m3u8, file_name, self.id, max_threads, use_ffmpeg, {}, delete_chunks)
         else:
