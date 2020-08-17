@@ -1,11 +1,12 @@
-from bs4 import BeautifulSoup
 import re
+from bs4 import BeautifulSoup
+
 class HtmlParser(object):
     def __init__(self, html):
         self.html = html
         self.soup = BeautifulSoup(html, "html.parser")
         
-    def get_full_url(self):
+    def get_full_m3u8_url(self):
         return f"{self.get_cdn()}/stream/{self.get_kwik_poster_url().replace('.jpg', '').replace('https://i.kwik.cx/snapshot/','')}/uwu.m3u8"
 
     def get_cdn(self):
@@ -17,4 +18,3 @@ class HtmlParser(object):
 
     def get_kwik_poster_url(self):
         return self.soup.find("video").get("poster")
-    

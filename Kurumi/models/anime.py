@@ -3,9 +3,8 @@ from Kurumi.models.episode import Episode, Episodes
 
 class Anime(object):
 
-    def __init__(self, json_response, network, loop):
-        self.__network = network
-        self.__loop = loop
+    def __init__(self, json_response, network):
+        self.__network__ = network
         self.id = json_response.get("id", None)
         self.episodes = json_response.get("episodes", None)
         self.title = json_response.get("title", None)
@@ -20,24 +19,25 @@ class Anime(object):
         self.year = json_response.get("year", None)
 
     def __repr__(self):
-        return f"<Anime {self.id}>"
+        return f"<Anime {self.title}>"
 
-    async def get_episodes_async(self):
+    async def get_episodes(self):
         if self.episodes < 1:
             pages = 1
         else:
-            pages = int(self.episodes / 30)
-        page = 1
+            pages = (self.episodes // 30)+1
         episodes = []
-        while page <= pages:
-            data = {'m': 'release', 'id': self.id, 'l': 30, 'sort': 'episode_asc', 'page': page}
-            res = await self.__network.get(data=data)
-            res = json.loads(await res.text())
-            if page == 1:
-                pages = res['last_page']
-            episodes += [Episode(episode, self.__network, self.__loop) for episode in res['data']]
-            page += 1
-        return Episodes(episodes)
+        for page in range(pages):
+            params = {
+                "m": "release",
+                "id": self.id,
+                "l": 30,
+                "sort": "episode_asc",
+                "page": page
+            }
+            json_response = await self.__network__.get_from_api(params = params)
+            episodes.extend([
+                Episode(episode_data, self.__network__) for episode_data in json_response["data"]
+                ])
 
-    def get_episodes(self):
-        return self.__loop.run_until_complete(self.get_episodes_async())
+        return Episodes(episodes)

@@ -1,5 +1,6 @@
 import json
 from Kurumi.utils.html_parser import HtmlParser
+from Kurumi.models.kwik_data import KwikVideoData
 
 class Episodes(object):
     def __init__(self, episodes):
@@ -15,9 +16,8 @@ class Episodes(object):
 
 class Episode(object):
 
-    def __init__(self, json_response, network, loop):
-        self.__network = network
-        self.__loop = loop
+    def __init__(self, json_response, network):
+        self.__network__ = network
         self.anime_id = json_response.get("anime_id", None)
         self.created_at = json_response.get("created_at", None)
         self.disc = json_response.get("disc", None)
@@ -35,41 +35,13 @@ class Episode(object):
     def __repr__(self):
         return f"<Episode {self.id}>"
 
-    async def get_downloads_async(self):
-        data = {'m': 'links', 'id': self.anime_id, 'session': self.session, 'p':'kwik'}
-        res = await self.__network.get(data=data)
-        json_response = json.loads(await res.text())
-        return [Downloadable(list(dwn.keys())[0], dwn[list(dwn.keys())[0]], self.__network, self.__loop) for dwn in json_response['data']]
-
-    def get_downloads(self):
-        return self.__loop.run_until_complete(self.get_downloads_async())
-
-class Downloadable(object):
-
-    def __init__(self, quality, json_response, network, loop):
-        self.__network = network
-        self.__loop = loop
-        self.quality = quality
-        self.filesize = json_response.get('filesize', None)
-        self.crc32 = json_response.get('crc32', None)
-        self.revision = json_response.get('revision', None)
-        self.fansub = json_response.get('fansub', None)
-        self.audio = json_response.get('audio', None)
-        self.disc = json_response.get('disc', None)
-        self.hq = json_response.get('hq', None)
-        self.kwik = json_response.get('kwik', None)
-        self.kwik_adfly = json_response.get('kwik_adfly', None)
-        self.kwik_shst = json_response.get('kwik_shst', None)
-        self.server = json_response.get('server', None)
-    
-    def __repr__(self):
-        return f'<Quality {self.quality}>'
-
-    async def get_m3u8_async(self):
-        res = await self.__network.get(url=self.kwik)
-        return HtmlParser(await res.text()).get_full_url()
-    
-    def get_m3u8(self):
-        return self.__loop.run_until_complete(self.get_m3u8_async())
-
-    # To get the m3u8 content the referer has to be https://kwik.cx
+    async def get_kwik_data(self):
+        params = {
+            "m": "links",
+            "id": self.anime_id,
+            "session": self.session,
+            "p": "kwik"
+        }
+        response = await self.__network__.get_from_api(params=params)
+        return [KwikVideoData(tuple(quality.keys())[0], quality[tuple(quality.keys())[0]], self.__network__) for quality in response["data"]] #This is horrible, it is not readable at all. We need to find a better way.
+        
