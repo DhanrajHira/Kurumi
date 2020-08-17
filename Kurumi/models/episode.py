@@ -1,6 +1,8 @@
 import json
 from Kurumi.utils.html_parser import HtmlParser
+from Kurumi.utils.download_network import DownloadNetwork
 from Kurumi.models.kwik_data import KwikVideoData
+from Yukinoshita.downloader import Downloader, MultiThreadDownloader
 
 class Episodes(object):
     def __init__(self, episodes):
@@ -45,3 +47,20 @@ class Episode(object):
         response = await self.__network__.get_from_api(params=params)
         return [KwikVideoData(tuple(quality.keys())[0], quality[tuple(quality.keys())[0]], self.__network__) for quality in response["data"]] #This is horrible, it is not readable at all. We need to find a better way.
         
+    async def download(self, quality, file_name=None, multi_threading=False, max_threads=None, use_ffmpeg=True, delete_chunks=True):
+        download_network = DownloadNetwork()
+        kwik_data = await self.get_kwik_data()
+        for video_data in kwik_data:
+            if video_data.quality == quality:
+                selected_data = video_data
+                break 
+        m3u8 = await selected_data.get_m3u8()
+        if file_name is None:
+            file_name = f"{self.id}-{self.episode}"
+        if multi_threading:
+            dl = MultiThreadDownloader(download_network, m3u8, file_name, self.id, max_threads, use_ffmpeg, {}, delete_chunks)
+        else:
+            dl = Downloader(download_network, m3u8, file_name, self.id, use_ffmpeg, delete_chunks, {})
+        dl.download()
+        dl.merge()
+        dl.remove_chunks()

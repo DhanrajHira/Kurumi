@@ -7,9 +7,8 @@ async def main():
     anime = res[2]
     print(anime.title)
     episodes = await anime.get_episodes()
-    episode = episodes.get_episode_by_number(1)
-    kwikdata = await episode.get_kwik_data()
-    print(await kwikdata[0].get_m3u8())
+    episode = episodes.get_episode_by_number(2)
+    await episode.download("720", delete_chunks = False)
     await client.close()
 
 asyncio.run(main())
